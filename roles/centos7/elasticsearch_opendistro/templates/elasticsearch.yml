@@ -2,9 +2,9 @@ cluster.name: "{{ elasticsearch_cluster_name }}"
 
 node.name: "{{ inventory_hostname }}"
 
-path.data: /var/lib/elasticsearch
+path.data: {{ es_data | default('/var/lib/elasticsearch') }}
 
-path.logs: /var/log/elasticsearch
+path.logs: {{ es_logs | default('/var/log/elasticsearch') }}
 
 network.host: "{{ hostvars[inventory_hostname]['ip'] }}"
 
