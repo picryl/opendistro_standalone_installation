@@ -1,9 +1,42 @@
 ---
 
-- name: add Elasticsearch repo
+- name: Add Elasticsearch repo
   become: yes
-  template: src=elasticsearch.repo dest=/etc/yum.repos.d/elasticsearch-{{ es_repo_name }}.repo
+  template:
+    src: elasticsearch.repo
+    dest: /etc/yum.repos.d/elasticsearch-{{ es_repo_name }}.repo
   when: es_use_repository
+
+- name: Download OpenDistro repo
+  become: yes
+  get_url:
+    url: https://d3g5vo6xdbdb9a.cloudfront.net/yum/opendistroforelasticsearch-artifacts.repo
+    dest: /etc/yum.repos.d/opendistroforelasticsearch-artifacts.repo
+  when: es_use_opendistro_repository
+
+- name: Add Opendistro gpg keys
+  rpm_key:
+    key: "{{ item }}"
+    state: present
+  with_items:
+    - https://d3g5vo6xdbdb9a.cloudfront.net/GPG-KEY-opendistroforelasticsearch
+    - https://artifacts.elastic.co/GPG-KEY-elasticsearch
+  when: es_use_opendistro_repository
+  register: import_key
+
+- name: Clean yum cache
+  command: yum clean all
+  when: es_use_opendistro_repository
+
+- name: Make yum cache
+  command: yum -q makecache -y
+  when: es_use_opendistro_repository
+
+- name: Make sure OSS Elasticsearch is absent
+  yum:
+    name: '{{ es_package_name }}'
+    state: absent
+  when: es_use_opendistro_repository
 
 - name: Install Elasticsearch
   become: yes
@@ -19,6 +52,39 @@
   delay: 10
   environment:
     ES_PATH_CONF: "/etc/elasticsearch"
+
+- name: Install libstdc++
+  yum:
+    name: compat-libstdc++-33
+    state: present
+  when: es_use_opendistro_repository
+
+- name: Install OpenDistro Elasticsearch
+  become: yes
+  yum:
+    name: 'opendistroforelasticsearch-{{ opendistro_version }}'
+    state: present
+    update_cache: yes
+  when: es_use_opendistro_repository
+  register: redhat_elasticsearch_install_from_repo
+  notify: restart elasticsearch
+  until: redhat_elasticsearch_install_from_repo.rc == 0
+  retries: 5
+  delay: 10
+  environment:
+    ES_PATH_CONF: "/etc/elasticsearch"
+
+
+- name: Remove demo certificates
+  file:
+    path: "/etc/elasticsearch/{{ item }}"
+    state: absent
+  with_items:
+    - esnode.pem
+    - esnode-key.pem
+    - kirk-key.pem
+    - kirk.pem
+  when: es_use_opendistro_repository
 
 #Copy the config template
 - name: Copy Configuration File

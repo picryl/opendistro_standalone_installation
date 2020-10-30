@@ -36,6 +36,10 @@
 -XX:+UseConcMarkSweepGC
 -XX:CMSInitiatingOccupancyFraction=75
 -XX:+UseCMSInitiatingOccupancyOnly
+# TODO: investigate proper garbage collection options
+-XX:+UseG1GC
+-XX:+UseStringDeduplication
+
 
 ## optimizations
 

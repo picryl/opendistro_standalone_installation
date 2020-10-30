@@ -6,13 +6,22 @@ path.data: {{ es_data | default('/var/lib/elasticsearch') }}
 
 path.logs: {{ es_logs | default('/var/log/elasticsearch') }}
 
-network.host: "{{ hostvars[inventory_hostname]['ip'] }}"
+{% if es_master %}
+node.master: true
+node.data: false
+node.ingest: false
+{% else %}
+node.master: false
+{% endif %}
+
+# network.host: "{{ hostvars[inventory_hostname]['ip'] }}"
+network.host: [_local_, _site_]
 
 http.port: 9200
 
-discovery.seed_hosts: ["{{ es_nodes }}"]
+discovery.seed_hosts: ["{{ es_master_nodes }}"]
 
-cluster.initial_master_nodes: ["{{ es_nodes }}"]
+cluster.initial_master_nodes: ["{{ es_master_nodes }}"]
 
 discovery.zen.minimum_master_nodes: "{{ minimum_master_nodes }}"
 
@@ -22,4 +31,5 @@ opendistro_security.audit.type: internal_elasticsearch
 opendistro_security.enable_snapshot_restore_privilege: true
 opendistro_security.check_snapshot_restore_write_privileges: true
 opendistro_security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+opendistro_security.ssl.transport.enabled: {{ enable_transport_ssl | string | lower }}
 {% endif %}

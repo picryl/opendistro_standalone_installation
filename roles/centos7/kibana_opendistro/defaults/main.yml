@@ -26,7 +26,7 @@ kibana_package_name: "kibana-oss"
 
 es_nodes_kibana: |-
         {% for item in groups['es-cluster'] -%}
-          https://{{ hostvars[item]['ip'] }}:{{ es_api_port }}{% if not loop.last %}","{% endif %}
+          http{% if opendistro_security_install_kibana %}s{% endif %}://{{ hostvars[item]['ip'] }}:{{ es_api_port }}{% if not loop.last %}","{% endif %}
         {%- endfor %}
 
 kibana_plugin_bin_path: /usr/share/kibana/bin/kibana-plugin

@@ -17,21 +17,26 @@
   include: opendistro_security.yml
   when: opendistro_security_install
 
+- name: ensure opendistro security plugin is absent
+  command: /usr/share/elasticsearch/bin/elasticsearch-plugin remove opendistro_security
+  ignore_errors: true
+  when: not opendistro_security_install
+
 - name: include opendistro alerting plugin for elasticsearch
   include: opendistro_alerting.yml
-  when: opendistro_alerting_install
+  when: opendistro_alerting_install and not es_use_opendistro_repository
 
 - name: include opendistro sql plugin for elasticsearch
   include: opendistro_sql.yml
-  when: opendistro_sql_install
+  when: opendistro_sql_install and not es_use_opendistro_repository
 
 - name: include opendistro ism plugin for elasticsearch
   include: opendistro_ism.yml
-  when: opendistro_ism_install
+  when: opendistro_ism_install and not es_use_opendistro_repository
 
 - name: include opendistro Anomaly Detection plugin for elasticsearch
   include: opendistro_ad.yml
-  when: opendistro_ad_install
+  when: opendistro_ad_install and not es_use_opendistro_repository
 
 - name: Get all the installed ES plugins
   command: "{{ es_plugin_bin_path }} list"
@@ -40,6 +45,12 @@
 - name: Show all the installed ES plugins
   debug:
     msg: "{{ list_plugins.stdout }}"
+
+- name: Ensure Elasticsearch is started
+  service:
+    name: elasticsearch
+    state: started
+    enabled: true
 
 - name: Wait for elasticsearch to startup
   wait_for: host={{ hostvars[inventory_hostname]['ip'] }} port={{es_api_port}} delay=5 connect_timeout=1

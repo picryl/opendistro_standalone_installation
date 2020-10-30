@@ -31,6 +31,12 @@ nodes:
     dns: {{ item }}.{{ domain_name }}
     ip: {{ hostvars[item]['ip'] }}
 {% endfor %}
+{% for item in groups['es-cluster-master'] %}
+  - name: {{ item }}
+    dn: CN={{ item }}.{{ domain_name }},OU=Ops,O={{ domain_name }}\, Inc.,DC={{ domain_name }}
+    dns: {{ item }}.{{ domain_name }}
+    ip: {{ hostvars[item]['ip'] }}
+{% endfor %}
 
 ###
 ### Clients
