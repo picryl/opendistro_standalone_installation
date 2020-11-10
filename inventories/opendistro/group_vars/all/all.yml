@@ -11,7 +11,7 @@ xms_value: 2
 xmx_value: 2
 
 # Elasticsearch version
-es_version: "7.8.0"
+es_version: "7.9.1"
 es_major_version: "7.x"
 
 # Configure hostnames for Elasticsearch nodes
@@ -20,5 +20,5 @@ es_major_version: "7.x"
 domain_name: example.com
 
 # Kibana version
-kibana_version: "7.8.0"
+kibana_version: "7.9.1"
 kibana_major_version: "7.x"

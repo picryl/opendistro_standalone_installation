@@ -13,6 +13,13 @@
 - name: include kibana installation
   include: kibana.yml
 
+- name: Ensure optimize directory is writable for Kibana user
+  file:
+    path: /usr/share/kibana/optimize
+    state: directory
+    owner: kibana
+    recurse: true
+
 - name: include opendistro security for kibana
   include: opendistro_security_kibana.yml
   when: opendistro_security_install_kibana
