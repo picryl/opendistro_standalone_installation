@@ -32,11 +32,11 @@
   command: yum -q makecache -y
   when: es_use_opendistro_repository
 
-- name: Make sure OSS Elasticsearch is absent
-  yum:
-    name: '{{ es_package_name }}'
-    state: absent
-  when: es_use_opendistro_repository
+#- name: Make sure OSS Elasticsearch is absent
+#  yum:
+#    name: '{{ es_package_name }}'
+#    state: absent
+#  when: es_use_opendistro_repository
 
 - name: Install Elasticsearch
   become: yes

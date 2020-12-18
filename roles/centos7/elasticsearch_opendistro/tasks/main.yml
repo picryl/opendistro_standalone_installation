@@ -22,6 +22,9 @@
   ignore_errors: true
   when: not opendistro_security_install
 
+- name: include repository s3 plugin for elasticsearch
+  include: opendistro_s3_repository_plugin.yml
+
 - name: include opendistro alerting plugin for elasticsearch
   include: opendistro_alerting.yml
   when: opendistro_alerting_install and not es_use_opendistro_repository
