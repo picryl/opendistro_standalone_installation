@@ -11,6 +11,13 @@
     state: present
     update_cache: yes
 
+- name: Ensure Kibana permissions
+  file:
+    path: /usr/share/kibana
+    owner: kibana
+    group: kibana
+    recurse: true
+
 - name: Copy the Configuration file
   template:
     src: kibana.yml

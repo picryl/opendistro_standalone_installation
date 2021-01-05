@@ -13,6 +13,9 @@
 - name: include kibana installation
   include: kibana.yml
 
+- name: include kibana plugins installation
+  include: plugins.yml
+
 - name: Ensure optimize directory is writable for Kibana user
   file:
     path: /usr/share/kibana/optimize
