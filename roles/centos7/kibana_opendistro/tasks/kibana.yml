@@ -1,5 +1,22 @@
 ---
 
+- name: Debug msg
+  debug:
+    msg: 'Kibana version to install: {{ kibana_package_name }}{% if kibana_version is defined and kibana_version != ""  %}-{{ kibana_version }}{% endif %}'
+
+- name: Ensure default Kibana is absent
+  when: uninstall_default_kibana
+  file:
+    path: /etc/yum.repos.d/kibana.repo
+    state: absent
+
+
+- name: Ensure default Kibana repo is absent
+  when: uninstall_default_kibana
+  package:
+    name: kibana
+    state: absent
+
 - name: add kibana repo
   template:
     src: kibana.repo
@@ -10,6 +27,7 @@
     name: '{{ kibana_package_name }}{% if kibana_version is defined and kibana_version != ""  %}-{{ kibana_version }}{% endif %}'
     state: present
     update_cache: yes
+    allow_downgrade: true
 
 - name: Ensure Kibana permissions
   file:
