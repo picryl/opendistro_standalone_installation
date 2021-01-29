@@ -1,0 +1,45 @@
+---
+
+# FIXME: hardcoded plugin versions will break on versions other than 7.9.1
+
+- name: Remove existing plugins
+  command: "sudo -u {{ kibana_plugin_bin_path }} list | awk -F @ {'print $1'} | xargs -n1 sudo -u kibana {{ kibana_plugin_bin_path }} remove"
+  ignore_errors: true
+  # when: remove_existing_kibana_plugins
+
+- name: Download plugins
+  get_url:
+    url: "{{ item }}"
+    dest: /tmp/
+  with_items:
+    - https://d3g5vo6xdbdb9a.cloudfront.net/downloads/kibana-plugins/opendistro-security/opendistro_security_kibana_plugin-1.11.0.0.zip
+    - https://d3g5vo6xdbdb9a.cloudfront.net/downloads/kibana-plugins/opendistro-alerting/opendistro-alerting-1.11.0.0.zip
+    - https://d3g5vo6xdbdb9a.cloudfront.net/downloads/kibana-plugins/opendistro-index-management/opendistro_index_management_kibana-1.11.0.0.zip
+    - https://d3g5vo6xdbdb9a.cloudfront.net/downloads/kibana-plugins/opendistro-query-workbench/opendistro-query-workbench-1.11.0.0.zip
+    - https://d3g5vo6xdbdb9a.cloudfront.net/downloads/kibana-plugins/opendistro-notebooks/opendistro-notebooks-kibana-1.11.0.0.zip
+
+
+#- name: Security Plugin Install | Install the Opendistro security plugin in kibana
+#  command: "sudo -u kibana {{ kibana_plugin_bin_path }} install file:///tmp/opendistro_security_kibana_plugin-1.11.0.0.zip"
+#  notify: restart kibana
+#  ignore_errors: true
+
+#- name: Alerting Plugin Install | Install the Opendistro alerting plugin in kibana
+#  command: "sudo -u kibana {{ kibana_plugin_bin_path }} install file:///tmp/opendistro-alerting-1.11.0.0.zip"
+#  notify: restart kibana
+#  ignore_errors: true
+
+#- name: Index State Management Plugin Install | Install the Opendistro index state management plugin in kibana
+#  command: "sudo -u kibana {{ kibana_plugin_bin_path }} install file:///tmp/opendistro_index_management_kibana-1.11.0.0.zip"
+#  notify: restart kibana
+#  ignore_errors: true
+
+- name: Query Workbench Plugin Install | Install the Opendistro query workbench plugin in kibana
+  command: "sudo -u kibana {{ kibana_plugin_bin_path }} install file:///tmp/opendistro-query-workbench-1.11.0.0.zip"
+  notify: restart kibana
+  ignore_errors: true
+
+- name: Notebook Install | Install the Opendistro notebook plugin in kibana
+  command: "sudo -u kibana {{ kibana_plugin_bin_path }} install file:///tmp/opendistro-notebooks-kibana-1.11.0.0.zip"
+  notify: restart kibana
+  ignore_errors: true

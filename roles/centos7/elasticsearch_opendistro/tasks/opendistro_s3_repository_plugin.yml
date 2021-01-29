@@ -1,0 +1,54 @@
+---
+
+# ingest-attachment
+#  mapper-annotated-text
+
+- name: Analyzing plugin directories to delete...
+  find:
+    paths: /usr/share/elasticsearch/plugins/
+    patterns: "installing-.*"
+    use_regex: true
+    file_type: directory
+  register: dirs_to_delete
+
+- name: Temporary directories to remove...
+  debug:
+    var: dirs_to_delete
+
+- name: Deleting temporary plugin directories...
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ dirs_to_delete.files }}"
+  become: yes
+
+- name: Workaround for performance analyzer
+  command: "echo false | sudo tee /usr/share/elasticsearch/data/batch_metrics_enabled.conf"
+
+- name: Restart Elasticsearch prior to installation
+  service:
+    name: elasticsearch
+    state: restarted
+
+- name: Install S3 repository plugin
+  community.general.elasticsearch_plugin:
+    name: repository-s3
+    state: present
+    force: yes
+
+#- name: Install ingest attachment plugin
+#  community.general.elasticsearch_plugin:
+#    name: ingest-attachment
+#    state: present
+
+- name: Install annotated text plugin
+  community.general.elasticsearch_plugin:
+    name: mapper-annotated-text
+    state: present
+    force: yes
+
+- name: Install phonetic analysis plugin
+  community.general.elasticsearch_plugin:
+    name: analysis-phonetic
+    state: present
+    force: yes
